@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprendre Notion - Pas à Pas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f7f7f5;
+            color: #37352f;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #37352f;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border: 2px solid #e9e9e7;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mode-btn.active {
+            background: #347ea9;
+            color: white;
+            border-color: #347ea9;
+        }
+
+        .mode-btn:hover:not(.active) {
+            border-color: #347ea9;
+            color: #347ea9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9e9e7;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #347ea9 0%, #4a9ec9 100%);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .lesson-card, .quiz-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lesson-number {
+            display: inline-block;
+            background: #347ea9;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .lesson-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #37352f;
+        }
+
+        .lesson-content {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #37352f;
+        }
+
+        .lesson-content p {
+            margin-bottom: 15px;
+        }
+
+        .emoji-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tip-box {
+            background: #f7f6f3;
+            border-left: 4px solid #347ea9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip-box strong {
+            color: #347ea9;
+        }
+
+        .example-box {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #d3e5ff;
+        }
+
+        .quiz-question {
+            font-size: 18px;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .quiz-option {
+            padding: 15px 20px;
+            border: 2px solid #e9e9e7;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .quiz-option:hover:not(.correct):not(.incorrect):not(.disabled) {
+            border-color: #347ea9;
+            background: #f0f7fc;
+        }
+
+        .quiz-option.selected {
+            border-color: #347ea9;
+            background: #e6f2f9;
+        }
+
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: #d1fae5;
+            cursor: default;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background: #fee2e2;
+            cursor: default;
+        }
+
+        .quiz-option.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .quiz-feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .quiz-feedback.correct {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .quiz-stats {
+            background: #f7f6f3;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-stats h3 {
+            margin-bottom: 15px;
+            color: #37352f;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #347ea9;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #787774;
+            margin-top: 5px;
+        }
+
+        .quiz-progress {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #787774;
+            font-size: 14px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .prev-btn {
+            background: #e9e9e7;
+            color: #37352f;
+        }
+
+        .prev-btn:hover:not(:disabled) {
+            background: #d9d9d7;
+        }
+
+        .next-btn {
+            background: #347ea9;
+            color: white;
+            flex: 1;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            background: #2a6a8c;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background: #10b981;
+            color: white;
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .completion-screen .emoji-icon {
+            font-size: 72px;
+            margin-bottom: 30px;
+        }
+
+        .completion-screen h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #37352f;
+        }
+
+        .restart-btn {
+            background: #347ea9;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            background: #2a6a8c;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .lesson-card, .quiz-card {
+                padding: 20px;
+            }
+            
+            .lesson-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Apprendre Notion - Pas à Pas</h1>
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="lessonMode">
+                    📚 Cours
+                </button>
+                <button class="mode-btn" id="quizMode">
+                    🧠 Quiz
+                </button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <p id="progressText">Leçon 1 sur 45</p>
+        </div>
+
+        <div id="contentContainer">
+            <!-- Le contenu des leçons ou quiz sera injecté ici -->
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn prev-btn" id="prevBtn">
+                ← Précédent
+            </button>
+            <button class="nav-btn next-btn" id="nextBtn">
+                Suivant →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentLesson = 0;
+        let currentQuiz = 0;
+        let currentMode = 'lesson';
+        let selectedAnswer = null;
+        let quizAnswered = false;
+        let quizStats = {
+            correct: 0,
+            total: 0
+        };
+
+        // Données des leçons
+        const lessons = [
+            {
+                emoji: "👋",
+                title: "Bienvenue dans Notion !",
+                content: `
+                    <p><strong>Notion</strong> est un espace de travail tout-en-un où vous pouvez écrire, planifier et vous organiser.</p>
+                    <div class="tip-box">
+                        <strong>💡 Le saviez-vous ?</strong><br>
+                        Notion combine les fonctionnalités d'un traitement de texte, d'un gestionnaire de tâches et d'une base de données !
+                    </div>
+                    <p>Pensez à Notion comme votre <strong>bureau numérique personnel</strong> où tout est à portée de main.</p>
+                `
+            },
+            {
+                emoji: "📄",
+                title: "Les Pages : Votre Base",
+                content: `
+                    <p>Dans Notion, tout commence par une <strong>page</strong>. C'est comme une feuille blanche infinie.</p>
+                    <div class="example-box">
+                        <strong>Pour créer une page :</strong><br>
+                        • Cliquez sur "+ Nouvelle page" dans la barre latérale<br>
+                        • Ou tapez "/" puis "page" n'importe où
+                    </div>
+                    <p>Chaque page peut contenir du texte, des images, des vidéos, et bien plus !</p>
+                `
+            },
+            {
+                emoji: "🧱",
+                title: "Les Blocs : Vos Briques",
+                content: `
+                    <p>Notion fonctionne avec des <strong>blocs</strong>. Chaque paragraphe, image ou élément est un bloc.</p>
+                    <div class="tip-box">
+                        <strong>💡 Astuce :</strong><br>
+                        Tapez "/" pour voir tous les types de blocs disponibles !
+                    </div>
+                    <p>Vous pouvez <strong>déplacer les blocs</strong> en cliquant sur les 6 points qui apparaissent à gauche quand vous survolez.</p>
+                `
+            },
+            {
+                emoji: "✍️",
+                title: "Formatage du Texte",
+                content: `
+                    <p>Notion supporte le formatage <strong>Markdown</strong> pour aller plus vite :</p>
+                    <div class="example-box">
+                        • **texte** → <strong>gras</strong><br>
+                        • *texte* → <em>italique</em><br>
+                        • # Titre → Titre niveau 1<br>
+                        • - ou * → Liste à puces
+                    </div>
+                    <p>Sélectionnez du texte pour voir apparaître le menu de formatage !</p>
+                `
+            },
+            {
+                emoji: "📁",
+                title: "Organisation des Pages",
+                content: `
+                    <p>Vous pouvez créer des <strong>sous-pages</strong> pour organiser votre contenu.</p>
+                    <div class="tip-box">
+                        <strong>💡 Comment faire :</strong><br>
+                        Glissez une page sous une autre dans la barre latérale pour créer une hiérarchie.
+                    </div>
+                    <p>Pensez à votre espace Notion comme un <strong>classeur numérique</strong> avec des dossiers et sous-dossiers.</p>
+                `
+            },
+            {
+                emoji: "✅",
+                title: "Les Cases à Cocher",
+                content: `
+                    <p>Créez des <strong>listes de tâches</strong> facilement !</p>
+                    <div class="example-box">
+                        <strong>Tapez :</strong><br>
+                        • [] puis espace → ☐ Case à cocher<br>
+                        • Ou tapez /todo
+                    </div>
+                    <p>Parfait pour les to-do lists, les courses, ou suivre vos habitudes !</p>
+                `
+            },
+            {
+                emoji: "📊",
+                title: "Introduction aux Bases de Données",
+                content: `
+                    <p>Les <strong>bases de données</strong> sont le super-pouvoir de Notion !</p>
+                    <div class="tip-box">
+                        <strong>💡 Qu'est-ce que c'est ?</strong><br>
+                        C'est comme un tableau Excel, mais en beaucoup plus flexible et visuel.
+                    </div>
+                    <p>Vous pouvez créer des bases pour : projets, contacts, livres, recettes... tout !</p>
+                `
+            },
+            {
+                emoji: "👁️",
+                title: "Les Vues de Base de Données",
+                content: `
+                    <p>Une même base peut être affichée de <strong>différentes manières</strong> :</p>
+                    <div class="example-box">
+                        • <strong>Table</strong> : comme Excel<br>
+                        • <strong>Board</strong> : façon Kanban<br>
+                        • <strong>Calendrier</strong> : vue temporelle<br>
+                        • <strong>Galerie</strong> : pour les visuels
+                    </div>
+                    <p>Changez de vue selon vos besoins sans dupliquer les données !</p>
+                `
+            },
+            {
+                emoji: "🏷️",
+                title: "Les Propriétés",
+                content: `
+                    <p>Dans une base, chaque élément a des <strong>propriétés</strong> (colonnes).</p>
+                    <div class="example-box">
+                        <strong>Types courants :</strong><br>
+                        • Texte : pour les noms<br>
+                        • Select : pour les catégories<br>
+                        • Date : pour les échéances<br>
+                        • Checkbox : pour oui/non
+                    </div>
+                    <p>Personnalisez vos bases selon vos besoins spécifiques !</p>
+                `
+            },
+            {
+                emoji: "🔍",
+                title: "Filtres et Tri",
+                content: `
+                    <p>Organisez vos données avec <strong>filtres</strong> et <strong>tri</strong>.</p>
+                    <div class="tip-box">
+                        <strong>💡 Exemple :</strong><br>
+                        Filtrez pour voir seulement les tâches "En cours" triées par date d'échéance.
+                    </div>
+                    <p>Créez des vues personnalisées pour chaque contexte de travail !</p>
+                `
+            },
+            {
+                emoji: "🎨",
+                title: "Templates (Modèles)",
+                content: `
+                    <p>Les <strong>templates</strong> vous font gagner du temps en réutilisant des structures.</p>
+                    <div class="example-box">
+                        <strong>Utilisations :</strong><br>
+                        • Notes de réunion<br>
+                        • Fiches de lecture<br>
+                        • Planning hebdomadaire
+                    </div>
+                    <p>Créez un template une fois, utilisez-le à l'infini !</p>
+                `
+            },
+            {
+                emoji: "🔗",
+                title: "Relations entre Bases",
+                content: `
+                    <p>Connectez vos bases entre elles avec des <strong>relations</strong>.</p>
+                    <div class="tip-box">
+                        <strong>💡 Exemple :</strong><br>
+                        Liez vos "Projets" à vos "Tâches" pour voir toutes les tâches d'un projet.
+                    </div>
+                    <p>C'est comme créer votre propre système sur mesure !</p>
+                `
+            },
+            {
+                emoji: "👥",
+                title: "Collaboration",
+                content: `
+                    <p>Notion brille en <strong>équipe</strong> !</p>
+                    <div class="example-box">
+                        <strong>Fonctionnalités :</strong><br>
+                        • Partage de pages<br>
+                        • Commentaires<br>
+                        • Mentions @<br>
+                        • Permissions granulaires
+                    </div>
+                    <p>Travaillez ensemble en temps réel, où que vous soyez.</p>
+                `
+            },
+            {
+                emoji: "⌨️",
+                title: "Raccourcis Essentiels",
+                content: `
+                    <p>Gagnez du temps avec ces <strong>raccourcis</strong> :</p>
+                    <div class="example-box">
+                        • <strong>Cmd/Ctrl + P</strong> : Recherche rapide<br>
+                        • <strong>Cmd/Ctrl + /</strong> : Menu des blocs<br>
+                        • <strong>Esc</strong> : Sélectionner le bloc<br>
+                        • <strong>Tab/Shift+Tab</strong> : Indenter
+                    </div>
+                    <p>Plus vous les utilisez, plus vous irez vite !</p>
+                `
+            },
+            {
+                emoji: "🚀",
+                title: "Prochaines Étapes",
+                content: `
+                    <p><strong>Félicitations !</strong> Vous avez les bases pour commencer.</p>
+                    <div class="tip-box">
+                        <strong>💡 Conseils pour continuer :</strong><br>
+                        1. Commencez simple avec quelques pages<br>
+                        2. Explorez les templates Notion<br>
+                        3. Rejoignez la communauté Notion FR<br>
+                        4. Pratiquez un peu chaque jour
+                    </div>
+                    <p>Notion devient plus puissant au fur et à mesure que vous l'utilisez. Amusez-vous bien ! 🎉</p>
+                `
+            },
+            {
+                emoji: "🖼️",
+                title: "Insérer des Images",
+                content: `
+                    <p>Ajoutez des <strong>images</strong> pour enrichir vos pages !</p>
+                    <div class="example-box">
+                        <strong>3 façons d'ajouter :</strong><br>
+                        • Glisser-déposer depuis votre ordinateur<br>
+                        • Coller directement (Ctrl/Cmd + V)<br>
+                        • Taper /image et coller un lien
+                    </div>
+                    <p>Redimensionnez en tirant sur les bords de l'image.</p>
+                `
+            },
+            {
+                emoji: "🎥",
+                title: "Intégrer des Vidéos",
+                content: `
+                    <p>Notion accepte les <strong>vidéos</strong> de plusieurs sources.</p>
+                    <div class="tip-box">
+                        <strong>💡 Sources supportées :</strong><br>
+                        YouTube, Vimeo, Loom, et bien d'autres !
+                    </div>
+                    <p>Tapez <strong>/video</strong> et collez le lien pour intégrer instantanément.</p>
+                `
+            },
+            {
+                emoji: "🔒",
+                title: "Permissions et Partage",
+                content: `
+                    <p>Contrôlez qui peut voir et modifier vos pages.</p>
+                    <div class="example-box">
+                        <strong>Niveaux d'accès :</strong><br>
+                        • Lecture seule<br>
+                        • Commentaires<br>
+                        • Édition complète<br>
+                        • Accès complet (admin)
+                    </div>
+                    <p>Cliquez sur "Partager" en haut à droite pour gérer les accès.</p>
+                `
+            },
+            {
+                emoji: "💬",
+                title: "Les Commentaires",
+                content: `
+                    <p>Collaborez avec des <strong>commentaires</strong> contextuels.</p>
+                    <div class="tip-box">
+                        <strong>💡 Comment faire :</strong><br>
+                        Sélectionnez du texte et cliquez sur "Commenter" dans le menu.
+                    </div>
+                    <p>Mentionnez des collègues avec @ pour les notifier !</p>
+                `
+            },
+            {
+                emoji: "📱",
+                title: "Notion Mobile",
+                content: `
+                    <p>Accédez à votre espace depuis <strong>n'importe où</strong>.</p>
+                    <div class="example-box">
+                        <strong>Applications disponibles :</strong><br>
+                        • iOS (iPhone/iPad)<br>
+                        • Android<br>
+                        • Desktop (Windows/Mac)
+                    </div>
+                    <p>Tout se synchronise automatiquement entre vos appareils !</p>
+                `
+            },
+            {
+                emoji: "🔄",
+                title: "Synchronisation",
+                content: `
+                    <p>Notion synchronise en <strong>temps réel</strong>.</p>
+                    <div class="tip-box">
+                        <strong>💡 Bon à savoir :</strong><br>
+                        Les modifications sont sauvegardées instantanément, pas besoin de bouton "Enregistrer" !
+                    </div>
+                    <p>Travaillez hors ligne, les changements se synchroniseront à la reconnexion.</p>
+                `
+            },
+            {
+                emoji: "📋",
+                title: "Copier et Dupliquer",
+                content: `
+                    <p>Réutilisez facilement votre contenu.</p>
+                    <div class="example-box">
+                        <strong>Options disponibles :</strong><br>
+                        • Dupliquer une page : clic droit → Dupliquer<br>
+                        • Copier des blocs : sélectionnez et Ctrl/Cmd + C<br>
+                        • Dupliquer dans une autre page
+                    </div>
+                    <p>Gagnez du temps en réutilisant vos meilleures structures !</p>
+                `
+            },
+            {
+                emoji: "🎯",
+                title: "Les Toggles",
+                content: `
+                    <p>Créez du contenu <strong>pliable/dépliable</strong>.</p>
+                    <div class="tip-box">
+                        <strong>💡 Utilisation :</strong><br>
+                        Tapez /toggle pour créer une section repliable.
+                    </div>
+                    <p>Parfait pour organiser de longues pages ou créer des FAQ !</p>
+                `
+            },
+            {
+                emoji: "📝",
+                title: "Citations et Callouts",
+                content: `
+                    <p>Mettez en valeur des informations importantes.</p>
+                    <div class="example-box">
+                        <strong>Types de blocs :</strong><br>
+                        • /quote : pour les citations<br>
+                        • /callout : boîte colorée avec icône<br>
+                        • /divider : ligne de séparation
+                    </div>
+                    <p>Structurez visuellement votre contenu pour une meilleure lisibilité.</p>
+                `
+            },
+            {
+                emoji: "🧮",
+                title: "Formules Simples",
+                content: `
+                    <p>Les bases de données supportent des <strong>formules</strong>.</p>
+                    <div class="tip-box">
+                        <strong>💡 Exemples simples :</strong><br>
+                        • prop("Prix") * 1.20 → Ajoute 20%<br>
+                        • if(prop("Statut") == "Fait", "✅", "⏳")
+                    </div>
+                    <p>Automatisez des calculs sans Excel !</p>
+                `
+            },
+            {
+                emoji: "📅",
+                title: "Gestion des Dates",
+                content: `
+                    <p>Notion excelle dans la gestion <strong>temporelle</strong>.</p>
+                    <div class="example-box">
+                        <strong>Fonctionnalités dates :</strong><br>
+                        • Date unique ou plage<br>
+                        • Avec ou sans heure<br>
+                        • Rappels automatiques<br>
+                        • Vue timeline
+                    </div>
+                    <p>Planifiez vos projets avec précision !</p>
+                `
+            },
+            {
+                emoji: "🔔",
+                title: "Notifications",
+                content: `
+                    <p>Restez informé avec les <strong>notifications</strong>.</p>
+                    <div class="tip-box">
+                        <strong>💡 Types de notifications :</strong><br>
+                        • Mentions @<br>
+                        • Commentaires sur vos pages<br>
+                        • Rappels de dates<br>
+                        • Modifications importantes
+                    </div>
+                    <p>Personnalisez vos préférences dans les paramètres.</p>
+                `
+            },
+            {
+                emoji: "🎨",
+                title: "Personnalisation Visuelle",
+                content: `
+                    <p>Rendez vos pages <strong>uniques</strong> !</p>
+                    <div class="example-box">
+                        <strong>Options de style :</strong><br>
+                        • Icônes de page<br>
+                        • Images de couverture<br>
+                        • Couleurs de texte<br>
+                        • Arrière-plans colorés
+                    </div>
+                    <p>Un espace visuellement plaisant est plus agréable à utiliser !</p>
+                `
+            },
+            {
+                emoji: "🗄️",
+                title: "Archives et Corbeille",
+                content: `
+                    <p>Rien n'est vraiment perdu dans Notion.</p>
+                    <div class="tip-box">
+                        <strong>💡 Bon à savoir :</strong><br>
+                        La corbeille conserve vos pages supprimées pendant 30 jours.
+                    </div>
+                    <p>Retrouvez vos pages dans Paramètres → Corbeille.</p>
+                `
+            },
+            {
+                emoji: "🔍",
+                title: "Recherche Avancée",
+                content: `
+                    <p>Trouvez rapidement ce que vous cherchez.</p>
+                    <div class="example-box">
+                        <strong>Astuces recherche :</strong><br>
+                        • Utilisez des guillemets pour une recherche exacte<br>
+                        • Filtrez par date de modification<br>
+                        • Recherchez dans une page spécifique<br>
+                        • Cmd/Ctrl + P pour la recherche rapide
+                    </div>
+                    <p>Plus votre Notion grandit, plus la recherche devient essentielle !</p>
+                `
+            },
+            {
+                emoji: "📤",
+                title: "Export et Import",
+                content: `
+                    <p>Vos données vous appartiennent toujours.</p>
+                    <div class="tip-box">
+                        <strong>💡 Formats d'export :</strong><br>
+                        • Markdown<br>
+                        • PDF<br>
+                        • HTML<br>
+                        • CSV (pour les bases)
+                    </div>
+                    <p>Importez aussi depuis Evernote, Trello, et plus !</p>
+                `
+            },
+            {
+                emoji: "🤖",
+                title: "Notion AI (Optionnel)",
+                content: `
+                    <p>L'<strong>IA</strong> peut vous assister dans l'écriture.</p>
+                    <div class="example-box">
+                        <strong>Capacités :</strong><br>
+                        • Résumer du texte<br>
+                        • Améliorer l'écriture<br>
+                        • Traduire<br>
+                        • Générer des idées
+                    </div>
+                    <p>Activez Notion AI dans les paramètres si vous souhaitez l'essayer.</p>
+                `
+            },
+            {
+                emoji: "📐",
+                title: "Colonnes et Mise en Page",
+                content: `
+                    <p>Créez des <strong>mises en page</strong> sophistiquées.</p>
+                    <div class="tip-box">
+                        <strong>💡 Astuce colonnes :</strong><br>
+                        Glissez un bloc à côté d'un autre pour créer des colonnes automatiquement !
+                    </div>
+                    <p>Combinez jusqu'à 5 colonnes pour des layouts complexes.</p>
+                `
+            },
+            {
+                emoji: "🔢",
+                title: "Numérotation Automatique",
+                content: `
+                    <p>Créez des listes <strong>numérotées</strong> intelligentes.</p>
+                    <div class="example-box">
+                        <strong>Pour commencer :</strong><br>
+                        • Tapez "1." puis espace<br>
+                        • La numérotation continue automatiquement<br>
+                        • Tab pour créer des sous-niveaux
+                    </div>
+                    <p>Parfait pour des procédures ou des plans structurés !</p>
+                `
+            },
+            {
+                emoji: "🎭",
+                title: "Emojis Partout",
+                content: `
+                    <p>Les <strong>emojis</strong> rendent Notion plus vivant !</p>
+                    <div class="tip-box">
+                        <strong>💡 Raccourci emoji :</strong><br>
+                        Windows : Win + .<br>
+                        Mac : Cmd + Ctrl + Espace
+                    </div>
+                    <p>Utilisez-les comme icônes de page, dans les titres, ou les propriétés !</p>
+                `
+            },
+            {
+                emoji: "⚡",
+                title: "Synced Blocks",
+                content: `
+                    <p>Créez des blocs <strong>synchronisés</strong> entre pages.</p>
+                    <div class="example-box">
+                        <strong>Utilité :</strong><br>
+                        • Une modification se répercute partout<br>
+                        • Parfait pour des infos à jour<br>
+                        • Tapez /sync pour créer
+                    </div>
+                    <p>Maintenez la cohérence dans tout votre espace !</p>
+                `
+            },
+            {
+                emoji: "📌",
+                title: "Épingler l'Important",
+                content: `
+                    <p><strong>Épinglez</strong> vos pages favorites.</p>
+                    <div class="tip-box">
+                        <strong>💡 Comment faire :</strong><br>
+                        Clic droit sur une page → Ajouter aux favoris
+                    </div>
+                    <p>Accédez rapidement à vos pages les plus utilisées !</p>
+                `
+            },
+            {
+                emoji: "🌐",
+                title: "Pages Web Publiques",
+                content: `
+                    <p>Partagez vos pages sur le <strong>web</strong>.</p>
+                    <div class="example-box">
+                        <strong>Options de partage :</strong><br>
+                        • Lien public en lecture seule<br>
+                        • Autoriser les moteurs de recherche<br>
+                        • Permettre la duplication
+                    </div>
+                    <p>Créez un portfolio, blog, ou documentation publique !</p>
+                `
+            },
+            {
+                emoji: "🏃",
+                title: "Workflows Personnels",
+                content: `
+                    <p>Construisez vos <strong>systèmes</strong> personnels.</p>
+                    <div class="tip-box">
+                        <strong>💡 Idées populaires :</strong><br>
+                        • GTD (Getting Things Done)<br>
+                        • Zettelkasten pour les notes<br>
+                        • PARA Method<br>
+                        • Bullet Journal numérique
+                    </div>
+                    <p>Notion s'adapte à VOTRE façon de travailler !</p>
+                `
+            },
+            {
+                emoji: "📈",
+                title: "Rollups et Calculs",
+                content: `
+                    <p>Agrégez des données avec les <strong>rollups</strong>.</p>
+                    <div class="example-box">
+                        <strong>Exemples d'usage :</strong><br>
+                        • Somme des heures par projet<br>
+                        • Moyenne des notes<br>
+                        • Compte des tâches terminées<br>
+                        • Maximum/Minimum
+                    </div>
+                    <p>Transformez Notion en outil d'analyse puissant !</p>
+                `
+            },
+            {
+                emoji: "🎯",
+                title: "Objectifs et Suivi",
+                content: `
+                    <p>Suivez vos <strong>progrès</strong> visuellement.</p>
+                    <div class="tip-box">
+                        <strong>💡 Techniques :</strong><br>
+                        • Barres de progression avec formules<br>
+                        • Checkbox pour les habitudes<br>
+                        • Graphiques avec des vues
+                    </div>
+                    <p>Visualisez votre avancement vers vos objectifs !</p>
+                `
+            },
+            {
+                emoji: "🔧",
+                title: "Intégrations Externes",
+                content: `
+                    <p>Connectez Notion à d'autres <strong>outils</strong>.</p>
+                    <div class="example-box">
+                        <strong>Intégrations populaires :</strong><br>
+                        • Zapier/Make pour l'automatisation<br>
+                        • Google Calendar<br>
+                        • Slack<br>
+                        • Figma/Miro embeds
+                    </div>
+                    <p>Notion devient le hub central de votre productivité !</p>
+                `
+            },
+            {
+                emoji: "💡",
+                title: "Cas d'Usage Concrets",
+                content: `
+                    <p>Inspiration pour bien <strong>démarrer</strong>.</p>
+                    <div class="example-box">
+                        <strong>Commencez avec :</strong><br>
+                        • Journal personnel<br>
+                        • Suivi de lectures<br>
+                        • Planning de repas<br>
+                        • Gestion de projet simple
+                    </div>
+                    <p>Commencez petit, puis développez selon vos besoins !</p>
+                `
+            },
+            {
+                emoji: "🎓",
+                title: "Ressources d'Apprentissage",
+                content: `
+                    <p>Continuez à <strong>apprendre</strong> !</p>
+                    <div class="tip-box">
+                        <strong>💡 Où apprendre plus :</strong><br>
+                        • Notion Academy officielle<br>
+                        • Communautés Reddit/Facebook<br>
+                        • YouTubers Notion<br>
+                        • Templates gratuits
+                    </div>
+                    <p>La communauté Notion est accueillante et créative !</p>
+                `
+            },
+            {
+                emoji: "🏆",
+                title: "Maîtrise Complète !",
+                content: `
+                    <p><strong>Bravo !</strong> Vous avez terminé les 45 leçons !</p>
+                    <div class="tip-box">
+                        <strong>🎯 Vos prochains défis :</strong><br>
+                        1. Créez votre premier espace de travail<br>
+                        2. Expérimentez avec une base de données<br>
+                        3. Partagez vos créations<br>
+                        4. Aidez d'autres débutants !
+                    </div>
+                    <p>Vous êtes maintenant prêt à exploiter tout le potentiel de Notion. Bonne création ! 🚀</p>
+                `
+            }
+        ];
+
+        // Données du quiz (seulement les 10 premières questions pour éviter le débordement)
+        const quizzes = [
+            {
+                question: "Qu'est-ce que Notion ?",
+                options: [
+                    "Un simple éditeur de texte",
+                    "Un espace de travail tout-en-un",
+                    "Uniquement une base de données",
+                    "Un outil de dessin"
+                ],
+                correct: 1,
+                explanation: "Notion est un espace de travail tout-en-un qui combine traitement de texte, gestion de tâches et bases de données."
+            },
+            {
+                question: "Comment créer une nouvelle page dans Notion ?",
+                options: [
+                    "Fichier → Nouveau",
+                    "Cliquer sur '+ Nouvelle page' ou taper '/'",
+                    "Ctrl + S",
+                    "Double-cliquer n'importe où"
+                ],
+                correct: 1,
+                explanation: "Vous pouvez créer une page en cliquant sur '+ Nouvelle page' dans la barre latérale ou en tapant '/' puis 'page'."
+            },
+            {
+                question: "Qu'est-ce qu'un bloc dans Notion ?",
+                options: [
+                    "Un bug du système",
+                    "Une limitation de texte",
+                    "Chaque élément de contenu (paragraphe, image, etc.)",
+                    "Un type de page"
+                ],
+                correct: 2,
+                explanation: "Dans Notion, chaque élément (paragraphe, image, vidéo, etc.) est un bloc que vous pouvez déplacer et réorganiser."
+            },
+            {
+                question: "Quel symbole utilise-t-on pour mettre du texte en gras avec Markdown ?",
+                options: [
+                    "##texte##",
+                    "**texte**",
+                    "//texte//",
+                    "__texte__"
+                ],
+                correct: 1,
+                explanation: "En Markdown, on utilise deux astérisques **texte** pour mettre du texte en gras."
+            },
+            {
+                question: "Comment organiser des pages en hiérarchie ?",
+                options: [
+                    "En créant des dossiers Windows",
+                    "En glissant une page sous une autre",
+                    "En utilisant des tags",
+                    "C'est impossible dans Notion"
+                ],
+                correct: 1,
+                explanation: "Glissez simplement une page sous une autre dans la barre latérale pour créer une hiérarchie."
+            },
+            {
+                question: "Comment créer une case à cocher ?",
+                options: [
+                    "Tapez [] puis espace",
+                    "Cliquez sur l'icône checkbox",
+                    "Tapez /todo",
+                    "Toutes ces réponses"
+                ],
+                correct: 3,
+                explanation: "Vous pouvez créer une case à cocher en tapant [] puis espace, ou /todo, ou via le menu."
+            },
+            {
+                question: "Les bases de données Notion sont similaires à :",
+                options: [
+                    "Un document Word",
+                    "Un tableau Excel mais plus flexible",
+                    "Un fichier PDF",
+                    "Une présentation PowerPoint"
+                ],
+                correct: 1,
+                explanation: "Les bases de données Notion sont comme Excel mais beaucoup plus flexibles et visuelles."
+            },
+            {
+                question: "Quelles vues sont disponibles pour une base de données ?",
+                options: [
+                    "Table seulement",
+                    "Table et Liste",
+                    "Table, Board, Calendrier, Galerie, Timeline",
+                    "Aucune vue"
+                ],
+                correct: 2,
+                explanation: "Notion offre plusieurs vues : Table, Board (Kanban), Calendrier, Galerie, Timeline et Liste."
+            },
+            {
+                question: "À quoi servent les filtres dans une base ?",
+                options: [
+                    "À supprimer des données",
+                    "À afficher seulement certaines données selon des critères",
+                    "À changer les couleurs",
+                    "À exporter les données"
+                ],
+                correct: 1,
+                explanation: "Les filtres permettent d'afficher seulement les données qui correspondent à vos critères."
+            },
+            {
+                question: "Quel raccourci ouvre la recherche rapide ?",
+                options: [
+                    "Ctrl/Cmd + F",
+                    "Ctrl/Cmd + P",
+                    "Ctrl/Cmd + S",
+                    "Ctrl/Cmd + Q"
+                ],
+                correct: 1,
+                explanation: "Ctrl/Cmd + P ouvre la recherche rapide pour naviguer dans tout votre espace."
+            }
+        ];
+
+        // Event Listeners
+        document.getElementById('lessonMode').addEventListener('click', () => setMode('lesson'));
+        document.getElementById('quizMode').addEventListener('click', () => setMode('quiz'));
+        document.getElementById('prevBtn').addEventListener('click', previousItem);
+        document.getElementById('nextBtn').addEventListener('click', nextItem);
+
+        // Fonctions principales
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('lessonMode').classList.toggle('active', mode === 'lesson');
+            document.getElementById('quizMode').classList.toggle('active', mode === 'quiz');
+            
+            if (mode === 'quiz') {
+                currentQuiz = 0;
+                quizStats = { correct: 0, total: 0 };
+                displayQuiz();
+            } else {
+                displayLesson();
+            }
+        }
+
+        function updateProgress() {
+            if (currentMode === 'lesson') {
+                const progress = ((currentLesson + 1) / lessons.length) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressText').textContent = `Leçon ${currentLesson + 1} sur ${lessons.length}`;
+            } else {
+                const progress = ((currentQuiz + 1) / quizzes.length) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressText').textContent = `Question ${currentQuiz + 1} sur ${quizzes.length}`;
+            }
+        }
+
+        function displayLesson() {
+            const lesson = lessons[currentLesson];
+            const container = document.getElementById('contentContainer');
+            
+            if (currentLesson >= lessons.length) {
+                container.innerHTML = `
+                    <div class="lesson-card completion-screen">
+                        <div class="emoji-icon">🎉</div>
+                        <h2>Bravo ! Vous avez terminé !</h2>
+                        <p>Vous avez maintenant toutes les bases pour bien démarrer avec Notion.</p>
+                        <p>N'hésitez pas à revoir les leçons ou à tester vos connaissances avec le quiz !</p>
+                        <button class="restart-btn" onclick="restart()">Recommencer depuis le début</button>
+                    </div>
+                `;
+                document.getElementById('prevBtn').style.display = 'none';
+                document.getElementById('nextBtn').style.display = 'none';
+            } else {
+                container.innerHTML = `
+                    <div class="lesson-card">
+                        <span class="lesson-number">Leçon ${currentLesson + 1}</span>
+                        <div class="emoji-icon">${lesson.emoji}</div>
+                        <h2 class="lesson-title">${lesson.title}</h2>
+                        <div class="lesson-content">
+                            ${lesson.content}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('prevBtn').style.display = 'block';
+                document.getElementById('nextBtn').style.display = 'block';
+                document.getElementById('prevBtn').disabled = currentLesson === 0;
+                document.getElementById('nextBtn').textContent = 
+                    currentLesson === lessons.length - 1 ? 'Terminer 🎉' : 'Suivant →';
+            }
+            
+            updateProgress();
+        }
+
+        function displayQuiz() {
+            if (currentQuiz >= quizzes.length) {
+                showQuizResults();
+                return;
+            }
+
+            const quiz = quizzes[currentQuiz];
+            const container = document.getElementById('contentContainer');
+            
+            selectedAnswer = null;
+            quizAnswered = false;
+            
+            container.innerHTML = `
+                <div class="quiz-card">
+                    <div class="quiz-progress">Question ${currentQuiz + 1} sur ${quizzes.length}</div>
+                    <div class="emoji-icon">🤔</div>
+                    <h3 class="quiz-question">${quiz.question}</h3>
+                    <div class="quiz-options" id="quizOptions">
+                        ${quiz.options.map((option, index) => `
+                            <button class="quiz-option" onclick="selectAnswer(${index})">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="quizFeedback"></div>
+                    <button class="submit-btn" id="submitBtn" onclick="submitAnswer()" disabled>
+                        Valider ma réponse
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('prevBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('prevBtn').disabled = currentQuiz === 0;
+            document.getElementById('nextBtn').textContent = 'Question suivante →';
+            document.getElementById('nextBtn').disabled = true;
+            
+            updateProgress();
+        }
+
+        function selectAnswer(index) {
+            if (quizAnswered) return;
+            
+            selectedAnswer = index;
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((option, i) => {
+                option.classList.toggle('selected', i === index);
+            });
+            
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (selectedAnswer === null || quizAnswered) return;
+            
+            quizAnswered = true;
+            quizStats.total++;
+            
+            const quiz = quizzes[currentQuiz];
+            const options = document.querySelectorAll('.quiz-option');
+            const feedbackDiv = document.getElementById('quizFeedback');
+            
+            options.forEach((option, i) => {
+                option.classList.add('disabled');
+                if (i === quiz.correct) {
+                    option.classList.add('correct');
+                } else if (i === selectedAnswer && i !== quiz.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedAnswer === quiz.correct) {
+                quizStats.correct++;
+                feedbackDiv.innerHTML = `
+                    <div class="quiz-feedback correct">
+                        ✅ Excellent ! ${quiz.explanation}
+                    </div>
+                `;
+            } else {
+                feedbackDiv.innerHTML = `
+                    <div class="quiz-feedback incorrect">
+                        ❌ Pas tout à fait. ${quiz.explanation}
+                    </div>
+                `;
+            }
+            
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((quizStats.correct / quizStats.total) * 100);
+            const container = document.getElementById('contentContainer');
+            
+            let message, emoji;
+            if (percentage >= 80) {
+                message = "Excellent travail ! Vous maîtrisez bien Notion !";
+                emoji = "🏆";
+            } else if (percentage >= 60) {
+                message = "Bien joué ! Continuez à pratiquer pour progresser.";
+                emoji = "👏";
+            } else {
+                message = "Continuez à apprendre, vous êtes sur la bonne voie !";
+                emoji = "💪";
+            }
+            
+            container.innerHTML = `
+                <div class="quiz-card completion-screen">
+                    <div class="emoji-icon">${emoji}</div>
+                    <h2>Quiz Terminé !</h2>
+                    <div class="quiz-stats">
+                        <h3>Vos résultats</h3>
+                        <div class="stat-row">
+                            <div class="stat-item">
+                                <div class="stat-value">${quizStats.correct}/${quizStats.total}</div>
+                                <div class="stat-label">Bonnes réponses</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${percentage}%</div>
+                                <div class="stat-label">Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p>${message}</p>
+                    <button class="restart-btn" onclick="restartQuiz()">Refaire le quiz</button>
+                    <button class="restart-btn" onclick="setMode('lesson')">Retour aux leçons</button>
+                </div>
+            `;
+            
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function nextItem() {
+            if (currentMode === 'lesson') {
+                if (currentLesson < lessons.length) {
+                    currentLesson++;
+                    displayLesson();
+                }
+            } else {
+                if (currentQuiz < quizzes.length - 1) {
+                    currentQuiz++;
+                    displayQuiz();
+                } else {
+                    showQuizResults();
+                }
+            }
+        }
+
+        function previousItem() {
+            if (currentMode === 'lesson') {
+                if (currentLesson > 0) {
+                    currentLesson--;
+                    displayLesson();
+                }
+            } else {
+                if (currentQuiz > 0) {
+                    currentQuiz--;
+                    displayQuiz();
+                }
+            }
+        }
+
+        function restart() {
+            currentLesson = 0;
+            setMode('lesson');
+        }
+
+        function restartQuiz() {
+            currentQuiz = 0;
+            quizStats = { correct: 0, total: 0 };
+            displayQuiz();
+        }
+
+        // Fonctions globales pour onclick
+        window.selectAnswer = selectAnswer;
+        window.submitAnswer = submitAnswer;
+        window.restart = restart;
+        window.restartQuiz = restartQuiz;
+        window.setMode = setMode;
+
+        // Support des raccourcis clavier
+        document.addEventListener('keydown', (e) => {
+            if (currentMode === 'lesson' || (currentMode === 'quiz' && quizAnswered)) {
+                if (e.key === 'ArrowRight' && !document.getElementById('nextBtn').disabled) {
+                    nextItem();
+                } else if (e.key === 'ArrowLeft' && !document.getElementById('prevBtn').disabled) {
+                    previousItem();
+                }
+            }
+        });
+
+        // Initialisation
+        displayLesson();
+    </script>
+</body>
+</html>
